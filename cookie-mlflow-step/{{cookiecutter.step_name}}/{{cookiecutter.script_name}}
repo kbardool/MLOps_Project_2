@@ -12,7 +12,8 @@ logger = logging.getLogger()
 
 
 def go(args):
-
+    
+    logging.info(f"Start {{cookiecutter.step_name}} run ")
     run = wandb.init(job_type="{{cookiecutter.job_type}}")
     run.config.update(args)
 
@@ -24,6 +25,13 @@ def go(args):
     # YOUR CODE HERE     #
     ######################
 
+
+
+    #################################
+    # Save and finish component run #
+    #################################
+    logger.info(f"End {{cookiecutter.step_name}} run")
+    run.finish()
 
 if __name__ == "__main__":
 

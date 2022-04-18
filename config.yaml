@@ -11,6 +11,8 @@ etl:
   max_price: 350  # dollars
 data_check:
   kl_threshold: 0.2
+  min_rows:    15000   # min number of rows
+  max_rows:  1000000   # max number of rows
 modeling:
   # Fraction of data to use for test (the remaining will be used for train and validation)
   test_size: 0.2
@@ -36,3 +38,4 @@ modeling:
     max_features: 0.5
     # DO not change the following
     oob_score: true
+  output_artifact: "trained_model"

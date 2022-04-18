@@ -2,9 +2,9 @@
 """
 This script download a URL to a local destination
 """
+import os
 import argparse
 import logging
-import os
 
 import wandb
 

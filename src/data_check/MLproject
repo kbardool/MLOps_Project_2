@@ -25,4 +25,12 @@ entry_points:
         description: Maximum accepted price
         type: float
 
-    command: "pytest . -vv --csv {csv} --ref {ref} --kl_threshold {kl_threshold} --min_price {min_price} --max_price {max_price}"
+      min_rows:
+        description: Minimum nuumber of input rows in dataset
+        type: integer
+
+      max_rows:
+        description: Minimum nuumber of input rows in dataset
+        type: integer
+
+    command: "pytest . -vv --csv {csv} --ref {ref} --kl_threshold {kl_threshold} --min_price {min_price} --max_price {max_price} --min_rows {min_rows} --max_rows {max_rows}"
