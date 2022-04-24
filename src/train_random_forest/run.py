@@ -92,37 +92,52 @@ def go(args):
     logger.info(f"MAE: {mae}")
 
 
-
-
+    ######################################
+    # Export model using mlflow
+    # Save the sk_pipe pipeline as a mlflow.sklearn model in the directory "random_forest_dir"
+    # HINT: use mlflow.sklearn.save_model
+    ######################################
     logger.info("Exporting model")
     # Save model package in the MLFlow sklearn format
     if os.path.exists("random_forest_dir"):
         shutil.rmtree("random_forest_dir")
 
-    ######################################
-    # Save the sk_pipe pipeline as a mlflow.sklearn model in the directory "random_forest_dir"
-    # HINT: use mlflow.sklearn.save_model
-    # YOUR CODE HERE
-    ######################################
-    export_model(sk_pipe, X_val, y_pred, "random_forest_dir")
+    # export_model(sk_pipe, X_val, y_pred, "random_forest_dir")
+    logger.info("Infer Signature")
+    signature = infer_signature(X_val, y_pred)
+
+    logger.info("Save model")
+    mlflow.sklearn.save_model(sk_pipe, 
+                              "random_forest_dir",
+                              serialization_format=mlflow.sklearn.SERIALIZATION_FORMAT_CLOUDPICKLE,
+                              signature = signature, 
+                              input_example = X_val.iloc[:5])    
 
 
     ######################################
     # Upload the model we just exported to W&B
-    # HINT: use wandb.Artifact to create an artifact. Use args.output_artifact as artifact name, "model_export" as
-    # type, provide a description and add rf_config as metadata. Then, use the .add_dir method of the artifact instance
-    # you just created to add the "random_forest_dir" directory to the artifact, and finally use
-    # run.log_artifact to log the artifact to the run
+    # HINT: use wandb.Artifact to create an artifact. 
+    # Use args.output_artifact as artifact name, 
+    #     "model_export" as  type, 
+    # provide a description and add rf_config as metadata. 
+    # Then, use the .add_dir method of the artifact instance
+    # you just created to add the "random_forest_dir" directory to the artifact, 
+    # and finally use run.log_artifact to log the artifact to the run
     ######################################
     logger.info("Load Exported model to WandB Server")
-    artifact = wandb.Artifact(name= args.output_artifact,
-                              type="model_export",
-                              description="Random Forest Pipeline", 
-                              metadata=rf_config)
+    artifact = wandb.Artifact(
+                    name= args.output_artifact,
+                    type="model_export",
+                    description="Random Forest Pipeline", 
+                    metadata=rf_config)
     artifact.add_dir("random_forest_dir")
     run.log_artifact(artifact)
+    artifact.wait()
 
+
+    ######################################
     # Plot feature importance
+    ######################################
     fig_feat_imp = plot_feature_importance(sk_pipe, processed_features)
 
     ######################################
@@ -153,9 +168,10 @@ def export_model(model, X, y, export_dir):
     logger.info("Save model")
     mlflow.sklearn.save_model(model, 
                               export_dir,
-                              signature = signature, 
                               serialization_format=mlflow.sklearn.SERIALIZATION_FORMAT_CLOUDPICKLE,
+                              signature = signature, 
                               input_example = X.iloc[:5])    
+
  
 
 def plot_feature_importance(pipe, feat_names):

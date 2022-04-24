@@ -83,12 +83,13 @@ def go(config: DictConfig):
                 },
             )
 
+                # f"{config['main']['components_repository']}/train_val_test_split",
         if "data_split" in active_steps:
             _ = mlflow.run(
-                f"{config['main']['components_repository']}/train_val_test_split",
+                f"{os.path.join(cwd_path,'components','train_val_test_split')}",                
                 "main",
                 parameters={
-                    "input"        : "clean_sample.csv:latest",
+                    "input"        : "clean_sample.csv:reference",
                     "test_size"    : config["modeling"]["test_size"],
                     "random_seed"  : config["modeling"]["random_seed"],
                     "stratify_by"  : config["modeling"]["stratify_by"]
@@ -97,7 +98,6 @@ def go(config: DictConfig):
 
 
         if "train_random_forest" in active_steps:
-            pass
             # NOTE: we need to serialize the random forest configuration into JSON
             rf_config = os.path.abspath("rf_config.json")
             with open(rf_config, "w+") as fp:
@@ -120,9 +120,10 @@ def go(config: DictConfig):
             )
 
 
+                # f"{config['main']['components_repository']}/test_regression_model",
         if "test_regression_model" in active_steps:
             _ = mlflow.run(
-                f"{config['main']['components_repository']}/test_regression_model",
+                f"{os.path.join(cwd_path,'components','test_regression_model')}",
                 "main",
                 parameters={
                     "mlflow_model" : f"{config['modeling']['output_artifact']}:prod",

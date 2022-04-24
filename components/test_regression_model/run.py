@@ -21,17 +21,22 @@ def go(args):
     run = wandb.init(job_type="test_model")
     run.config.update(args)
 
-    logger.info("Downloading artifacts")
-    # Download input artifact. This will also log that this script is using this
-    # particular version of the artifact
-    model_local_path = run.use_artifact(args.mlflow_model).download()
-
+    logger.info(f"Downloading dataset artifact - {args.test_dataset}")
     # Download test dataset
     test_dataset_path = run.use_artifact(args.test_dataset).file()
 
     # Read test dataset
+    logger.info(f"Read tet dataset from - {test_dataset_path}")
     X_test = pd.read_csv(test_dataset_path)
     y_test = X_test.pop("price")
+
+    
+    logger.info(f"Downloading model artifact - {args.mlflow_model}")
+    # Download input artifact. This will also log that this script is using this
+    # particular version of the artifact
+    model_local_path = run.use_artifact(args.mlflow_model).download()
+
+
 
     logger.info("Loading model and performing inference on test set")
     sk_pipe = mlflow.sklearn.load_model(model_local_path)
